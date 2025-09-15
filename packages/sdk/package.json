@@ -1,0 +1,27 @@
+{
+  "name": "@all-influencer/sdk",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist generated",
+    "generate": "node scripts/generate-client.js",
+    "generate:watch": "nodemon --watch ../api/src --exec \"npm run generate\""
+  },
+  "dependencies": {
+    "@all-influencer/types": "*",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "nodemon": "^3.0.2",
+    "typescript": "^5.3.3",
+    "openapi-typescript": "^6.7.3",
+    "@types/node": "^20.10.5"
+  }
+}

@@ -1,0 +1,114 @@
+import Link from 'next/link';
+import { ArrowRight, Users, TrendingUp, Star, Zap } from 'lucide-react';
+
+export default function HomePage() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl font-bold mb-6 text-gray-900">
+              최고의 인플루언서들과<br />
+              브랜드를 연결하는 플랫폼
+            </h1>
+            <p className="text-xl mb-8 text-gray-600">
+              All Influencer와 함께 성공적인 인플루언서 마케팅을 시작하세요.
+              검증된 인플루언서들과 브랜드 매칭 서비스를 제공합니다.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link 
+                href="/users"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                인플루언서 둘러보기
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+              <Link 
+                href="/about"
+                className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                더 알아보기
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold mb-4">왜 All Influencer인가?</h2>
+            <p className="text-lg text-gray-600">
+              검증된 인플루언서와 브랜드 매칭부터 캠페인 관리까지, 
+              모든 것을 한 곳에서 해결하세요.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-white border rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <feature.icon className="h-6 w-6 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-blue-600">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-white">지금 시작해보세요</h2>
+          <p className="text-xl mb-8 text-blue-100">
+            수천 명의 검증된 인플루언서들이 기다리고 있습니다.
+          </p>
+          <Link 
+            href="/users"
+            className="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            인플루언서 목록 보기
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h3 className="text-lg font-semibold mb-2">All Influencer</h3>
+          <p className="text-sm text-gray-400">
+            © 2024 All Influencer. 모든 권리 보유.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+const features = [
+  {
+    icon: Users,
+    title: '검증된 인플루언서',
+    description: '엄격한 심사를 통과한 양질의 인플루언서들만 선별합니다.',
+  },
+  {
+    icon: TrendingUp,
+    title: '데이터 기반 매칭',
+    description: '브랜드와 인플루언서의 완벽한 매칭을 위한 AI 알고리즘을 제공합니다.',
+  },
+  {
+    icon: Star,
+    title: '품질 보장',
+    description: '모든 캠페인에 대해 품질을 보장하고 성과를 추적합니다.',
+  },
+  {
+    icon: Zap,
+    title: '빠른 실행',
+    description: '캠페인 기획부터 실행까지 빠르고 효율적으로 진행합니다.',
+  },
+];

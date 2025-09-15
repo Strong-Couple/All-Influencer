@@ -1,0 +1,428 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 사용자 기본 정보 (OAuth 지원)
+model User {
+  id           String     @id @default(cuid())
+  email        String?    @unique // OAuth로 이메일 없을 수 있음
+  username     String?    @unique // OAuth 사용자는 username 없을 수 있음
+  passwordHash String?    // OAuth 사용자는 패스워드 없음
+  displayName  String?    // 소셜에서 가져올 수 있음
+  avatar       String?
+  role         UserRole   @default(INFLUENCER)
+  status       UserStatus @default(ACTIVE)
+  bio          String?
+  website      String?
+  lastLoginAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // OAuth Relations
+  identities      UserIdentity[]
+  refreshSessions RefreshSession[]
+
+  // Business Relations
+  influencerProfile InfluencerProfile?
+  advertiserCompany AdvertiserCompany?
+  jobPosts         JobPost[]
+  applications     Application[]
+  sentOffers       Offer[] @relation("OfferSender")
+  receivedOffers   Offer[] @relation("OfferReceiver")
+  contracts        Contract[]
+  sentMessages     ChatMessage[] @relation("MessageSender")
+  receivedMessages ChatMessage[] @relation("MessageReceiver")
+  notifications    Notification[]
+  givenReviews     Review[] @relation("ReviewGiver")
+  receivedReviews  Review[] @relation("ReviewReceiver")
+  refreshTokens    RefreshToken[] // 기존 호환성 유지
+
+  @@index([email])
+  @@index([role, status])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// 인플루언서 프로필
+model InfluencerProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  categories  String[] // 전문 분야
+  followers   Int      @default(0)
+  avgEngagement Float  @default(0.0)
+  ratePerPost Int?     // 포스트당 요금
+  location    String?
+  languages   String[] @default(["ko"])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channels Channel[]
+
+  @@index([userId])
+  @@index([categories])
+  @@index([followers])
+  @@map("influencer_profiles")
+}
+
+// 광고주 회사
+model AdvertiserCompany {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  companyName String
+  industry    String
+  description String?
+  website     String?
+  location    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPosts JobPost[]
+
+  @@index([userId])
+  @@index([industry])
+  @@map("advertiser_companies")
+}
+
+// 소셜미디어 채널
+model Channel {
+  id               String   @id @default(cuid())
+  influencerProfileId String
+  platform         Platform
+  channelUrl       String
+  channelHandle    String
+  followers        Int      @default(0)
+  avgViews         Int      @default(0)
+  avgLikes         Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  influencerProfile InfluencerProfile @relation(fields: [influencerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([influencerProfileId])
+  @@index([platform])
+  @@map("channels")
+}
+
+// 구인 공고
+model JobPost {
+  id          String     @id @default(cuid())
+  userId      String     // 광고주
+  companyId   String?
+  title       String
+  description String
+  requirements String?
+  budget      Int?       // 예산
+  categories  String[]   // 필요 분야
+  platforms   Platform[] // 필요 플랫폼
+  deadline    DateTime?
+  status      JobPostStatus @default(OPEN)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     AdvertiserCompany? @relation(fields: [companyId], references: [id])
+  applications Application[]
+  offers      Offer[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([categories])
+  @@index([createdAt])
+  @@index([deadline])
+  @@map("job_posts")
+}
+
+// 지원서
+model Application {
+  id          String            @id @default(cuid())
+  jobPostId   String
+  userId      String            // 인플루언서
+  coverLetter String?
+  proposedRate Int?
+  status      ApplicationStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // Relations
+  jobPost JobPost @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  offers  Offer[]
+
+  @@unique([jobPostId, userId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("applications")
+}
+
+// 제안서/오퍼
+model Offer {
+  id            String      @id @default(cuid())
+  jobPostId     String
+  applicationId String?
+  senderId      String      // 제안 보내는 사람
+  receiverId    String      // 제안 받는 사람
+  amount        Int
+  description   String?
+  deadline      DateTime?
+  status        OfferStatus @default(PENDING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  jobPost     JobPost      @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id])
+  sender      User         @relation("OfferSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User         @relation("OfferReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  contract    Contract?
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("offers")
+}
+
+// 계약
+model Contract {
+  id           String         @id @default(cuid())
+  offerId      String         @unique
+  userId       String         // 인플루언서
+  amount       Int
+  startDate    DateTime
+  endDate      DateTime?
+  deliverables String[]
+  terms        String?
+  status       ContractStatus @default(ACTIVE)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Relations
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("contracts")
+}
+
+// 채팅 메시지
+model ChatMessage {
+  id         String      @id @default(cuid())
+  senderId   String
+  receiverId String
+  content    String
+  type       MessageType @default(TEXT)
+  isRead     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // Relations
+  sender   User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+  @@index([isRead])
+  @@map("chat_messages")
+}
+
+// 알림
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  data      Json?            // 추가 메타데이터
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// 리뷰/평가
+model Review {
+  id         String @id @default(cuid())
+  giverId    String // 평가하는 사람
+  receiverId String // 평가받는 사람
+  rating     Int    // 1-5 점수
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  giver    User @relation("ReviewGiver", fields: [giverId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReviewReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([giverId, receiverId])
+  @@index([giverId])
+  @@index([receiverId])
+  @@index([rating])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
+// Enums
+// Refresh 토큰 관리
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  jti       String   @unique // JWT ID
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([jti])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+enum UserRole {
+  INFLUENCER
+  ADVERTISER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum Platform {
+  INSTAGRAM
+  YOUTUBE
+  TIKTOK
+  TWITTER
+  FACEBOOK
+  TWITCH
+  LINKEDIN
+  BLOG
+}
+
+enum JobPostStatus {
+  OPEN
+  CLOSED
+  COMPLETED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum ContractStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  TERMINATED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+}
+
+enum NotificationType {
+  APPLICATION
+  OFFER
+  CONTRACT
+  MESSAGE
+  REVIEW
+  SYSTEM
+}
+
+// OAuth 프로바이더
+enum AuthProvider {
+  GOOGLE
+  KAKAO
+  NAVER
+}
+
+// OAuth 사용자 연동 정보
+model UserIdentity {
+  id              String       @id @default(cuid())
+  userId          String
+  provider        AuthProvider
+  providerUserId  String       // 소셜 고유 ID (Google: sub, Kakao: id, Naver: response.id)
+  email           String?      // 프로바이더 제공 이메일 (없을 수도 있음)
+  accessTokenEnc  String?      // (선택) 암호화된 액세스 토큰
+  refreshTokenEnc String?      // (선택) 암호화된 리프레시 토큰
+  scope           String?      // 승인된 권한 범위
+  rawData         Json?        // 원본 프로필 데이터 (디버깅/분석용)
+  linkedAt        DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([provider, providerUserId]) // 동일 provider-userId는 1:1
+  @@index([userId])
+  @@index([email])
+  @@index([provider])
+  @@map("user_identities")
+}
+
+// Refresh 토큰 세션 관리 (쿠키 기반)
+model RefreshSession {
+  id        String   @id @default(cuid())
+  userId    String
+  jti       String   @unique // JWT ID (토큰 로테이션용)
+  uaHash    String?  // User-Agent 해시 (보안 강화, 선택)
+  ipHash    String?  // IP 해시 (보안 강화, 선택)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Indexes for performance
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([jti])
+  @@map("refresh_sessions")
+}
