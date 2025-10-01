@@ -129,7 +129,7 @@ export class JwtCookieService {
     try {
       return this.jwtService.verify(token);
     } catch (error) {
-      this.logger.debug('Token verification failed', error.message);
+      this.logger.debug('Token verification failed', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -141,7 +141,7 @@ export class JwtCookieService {
     try {
       return this.jwtService.decode(token) as JwtPayload | RefreshPayload;
     } catch (error) {
-      this.logger.debug('Token decode failed', error.message);
+      this.logger.debug('Token decode failed', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }

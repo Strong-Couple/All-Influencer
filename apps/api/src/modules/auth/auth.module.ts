@@ -10,11 +10,13 @@ import { PrismaModule } from '../../common/database/prisma.module';
 import { AuthController } from './auth.controller';
 import { OAuthController } from './controllers/oauth.controller';
 import { AccountLinkController } from './controllers/account-link.controller';
+import { LocalAuthController } from './local/local.controller';
 
 // Services
 import { AuthService } from './auth.service';
 import { TokenService } from './services/token.service';
 import { OAuthIntegrationService } from './services/oauth-integration.service';
+import { LocalAuthService } from './local/local.service';
 
 // Common Services
 import { JwtCookieService } from '../../common/services/jwt-cookie.service';
@@ -46,12 +48,14 @@ import { NaverStrategy } from './strategies/naver.strategy';
     AuthController,
     OAuthController,
     AccountLinkController,
+    LocalAuthController,
   ],
   providers: [
     // Core Services
     AuthService,
     TokenService,
     OAuthIntegrationService,
+    LocalAuthService,
     
     // Common Services
     JwtCookieService,
@@ -72,6 +76,7 @@ import { NaverStrategy } from './strategies/naver.strategy';
     AuthService,
     TokenService,
     OAuthIntegrationService,
+    LocalAuthService,
     JwtCookieService,
     RefreshSessionService,
     JwtAuthGuard,

@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class GetUserByIdUseCase {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(/* private readonly usersRepository: UsersRepository */) {}
 
   async execute(id: string) {
     if (!id || !this.isValidId(id)) {

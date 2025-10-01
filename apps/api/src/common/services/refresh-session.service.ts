@@ -113,7 +113,7 @@ export class RefreshSessionService {
       this.logger.debug(`Deleted refresh session ${jti}`);
     } catch (error) {
       // 세션이 이미 없을 수도 있음
-      this.logger.debug(`Failed to delete session ${jti}`, error.message);
+      this.logger.debug(`Failed to delete session ${jti}`, error instanceof Error ? error.message : 'Unknown error');
     }
   }
 

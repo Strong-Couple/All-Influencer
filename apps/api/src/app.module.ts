@@ -6,6 +6,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './common/database';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { MyPageModule } from './modules/my-page/my-page.module';
 import { JwtAuthGuard } from './modules/auth/guards';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { configFactory } from './config/config.factory';
@@ -28,6 +29,7 @@ import { createSecurityConfig } from './common/config/security.config';
     PrismaModule,
     AuthModule,
     UsersModule,
+    MyPageModule,
   ],
   controllers: [],
   providers: [
