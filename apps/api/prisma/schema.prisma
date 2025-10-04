@@ -44,6 +44,7 @@ model User {
   givenReviews     Review[] @relation("ReviewGiver")
   receivedReviews  Review[] @relation("ReviewReceiver")
   refreshTokens    RefreshToken[] // 기존 호환성 유지
+  scraps          Scrap[] // 스크랩 관계 추가
 
   @@index([email])
   @@index([role, status])
@@ -61,6 +62,14 @@ model InfluencerProfile {
   ratePerPost Int?     // 포스트당 요금
   location    String?
   languages   String[] @default(["ko"])
+  
+  // 이력서 관련 필드 추가
+  headline    String?  // 한 줄 소개
+  bio         String?  // 자기소개
+  skills      String[] @default([]) // 보유 기술/관심 키워드
+  portfolioUrls String[] @default([]) // 포트폴리오 링크
+  resumeJson  Json?    // 자유 양식(경력, 학력, 자격증 등)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -137,6 +146,7 @@ model JobPost {
   company     AdvertiserCompany? @relation(fields: [companyId], references: [id])
   applications Application[]
   offers      Offer[]
+  scraps      Scrap[] // 스크랩 관계 추가
 
   @@index([userId])
   @@index([status])
@@ -166,6 +176,7 @@ model Application {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([status, createdAt]) // 보강된 인덱스
   @@map("applications")
 }
 
@@ -425,4 +436,21 @@ model RefreshSession {
   @@index([expiresAt])
   @@index([jti])
   @@map("refresh_sessions")
+}
+
+// 스크랩(북마크) 모델
+model Scrap {
+  id        String   @id @default(cuid())
+  userId    String   // INFLUENCER의 User.id
+  jobPostId String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPost JobPost @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobPostId])
+  @@index([userId, createdAt])
+  @@index([jobPostId])
+  @@map("scraps")
 }

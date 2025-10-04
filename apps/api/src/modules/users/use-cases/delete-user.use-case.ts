@@ -3,7 +3,7 @@ import { UsersRepository } from '../repositories/users.repository';
 
 @Injectable()
 export class DeleteUserUseCase {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(/* private readonly usersRepository: UsersRepository */) {}
 
   async execute(id: string) {
     // 사용자 존재 확인

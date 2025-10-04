@@ -178,11 +178,17 @@ export class AuthController {
         req.ip,
       );
 
+      // 사용자 정보 조회
+      const user = await this.authService.findUserById(session.userId);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
       // 새 토큰 생성
       const newTokens = this.jwtCookieService.generateTokenPair({
         sub: session.userId,
-        email: session.user.email,
-        role: session.user.role,
+        email: user.email,
+        role: user.role,
       });
 
       // 세션 로테이션 (기존 삭제 후 새로 생성)

@@ -14,7 +14,7 @@ export interface UpdateUserRequest {
 
 @Injectable()
 export class UpdateUserUseCase {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(/* private readonly usersRepository: UsersRepository */) {}
 
   async execute(id: string, request: UpdateUserRequest) {
     // 사용자 존재 확인
@@ -24,7 +24,7 @@ export class UpdateUserUseCase {
     }
 
     // 업데이트할 데이터 준비
-    const updateData: UpdateUserData = {};
+    const updateData: any /* UpdateUserData */ = {};
     
     if (request.displayName !== undefined) updateData.displayName = request.displayName;
     if (request.avatar !== undefined) updateData.avatar = request.avatar;

@@ -86,7 +86,7 @@ export class TokenService {
     try {
       return this.jwtService.verify<JwtPayload>(token);
     } catch (error) {
-      this.logger.warn(`Invalid access token: ${error.message}`);
+      this.logger.warn(`Invalid access token: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new Error('Invalid access token');
     }
   }
@@ -117,7 +117,7 @@ export class TokenService {
 
       return payload;
     } catch (error) {
-      this.logger.warn(`Invalid refresh token: ${error.message}`);
+      this.logger.warn(`Invalid refresh token: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new Error('Invalid refresh token');
     }
   }
@@ -132,7 +132,7 @@ export class TokenService {
       });
       this.logger.log(`Refresh token revoked: ${jti}`);
     } catch (error) {
-      this.logger.warn(`Failed to revoke refresh token: ${error.message}`);
+      this.logger.warn(`Failed to revoke refresh token: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -146,7 +146,7 @@ export class TokenService {
       });
       this.logger.log(`All refresh tokens revoked for user: ${userId}`);
     } catch (error) {
-      this.logger.warn(`Failed to revoke user refresh tokens: ${error.message}`);
+      this.logger.warn(`Failed to revoke user refresh tokens: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -221,7 +221,7 @@ export class TokenService {
       
       this.logger.log(`Cleaned up ${result.count} expired refresh tokens`);
     } catch (error) {
-      this.logger.error(`Failed to cleanup expired tokens: ${error.message}`);
+      this.logger.error(`Failed to cleanup expired tokens: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 }

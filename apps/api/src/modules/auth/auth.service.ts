@@ -92,7 +92,7 @@ export class AuthService {
         expiresIn: 15 * 60, // 15분
       };
     } catch (error) {
-      this.logger.error(`Sign up failed: ${error.message}`, error.stack);
+      this.logger.error(`Sign up failed: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
       throw new BadRequestException('회원가입에 실패했습니다.');
     }
   }
@@ -167,7 +167,7 @@ export class AuthService {
     try {
       return await this.tokenService.rotateTokens(refreshToken);
     } catch (error) {
-      this.logger.warn(`Token refresh failed: ${error.message}`);
+      this.logger.warn(`Token refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new UnauthorizedException('토큰 갱신에 실패했습니다. 다시 로그인해주세요.');
     }
   }
@@ -184,7 +184,7 @@ export class AuthService {
       
       return { message: '성공적으로 로그아웃되었습니다.' };
     } catch (error) {
-      this.logger.warn(`Logout failed: ${error.message}`);
+      this.logger.warn(`Logout failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       // 로그아웃은 실패해도 성공으로 처리
       return { message: '로그아웃되었습니다.' };
     }
@@ -201,7 +201,7 @@ export class AuthService {
       
       return { message: '모든 기기에서 로그아웃되었습니다.' };
     } catch (error) {
-      this.logger.warn(`Logout all failed: ${error.message}`);
+      this.logger.warn(`Logout all failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return { message: '로그아웃되었습니다.' };
     }
   }
@@ -262,7 +262,7 @@ export class AuthService {
         // 여기서는 기본 프로필만 생성하지 않음
       }
     } catch (error) {
-      this.logger.warn(`Failed to create user profile: ${error.message}`);
+      this.logger.warn(`Failed to create user profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
       // 프로필 생성 실패는 사용자 생성을 막지 않음
     }
   }
@@ -344,6 +344,23 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * 사용자 ID로 사용자 조회
+   */
+  async findUserById(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        avatar: true,
+        role: true,
+        status: true,
+      },
+    });
   }
 }
 

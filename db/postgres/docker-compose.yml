@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    container_name: allinfluencer-postgres
+    environment:
+      POSTGRES_USER: allinfluencer
+      POSTGRES_PASSWORD: allinfluencer
+      POSTGRES_DB: allinfluencer
+      TZ: Asia/Seoul
+    ports:
+      - "5433:5432"
+    volumes:
+      - ../data:/var/lib/postgresql/data
+  adminer:
+    image: adminer:4
+    container_name: allinfluencer-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Asia/Seoul
