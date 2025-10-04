@@ -124,3 +124,13 @@ packages/sdk/generated/
 # Misc
 .cache/
 
+# PostgreSQL data files
+db/data/
+postgres_data/
+
+# Database backup files
+*.sql.backup
+*.dump
+
+# Docker volumes
+postgres_volume_backup.tar.gz

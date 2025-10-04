@@ -2,38 +2,38 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:16
-    container_name: all-influencer-db
+    image: postgres:16-alpine
+    container_name: allinfluencer-postgres
     restart: unless-stopped
+    environment:
+      POSTGRES_DB: allinfluencer
+      POSTGRES_USER: allinfluencer
+      POSTGRES_PASSWORD: allinfluencer
+      TZ: Asia/Seoul
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: all_influencer
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: devpass
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/api/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dev -d all_influencer"]
+      test: ["CMD-SHELL", "pg_isready -U allinfluencer -d allinfluencer"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: all-influencer-pgadmin
+  adminer:
+    image: adminer:4-standalone
+    container_name: allinfluencer-adminer
     restart: unless-stopped
-    ports:
-      - "5050:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: dracula
+    ports:
+      - "8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
-  pgdata:
-  pgadmin-data:
+  postgres_data:
+    driver: local

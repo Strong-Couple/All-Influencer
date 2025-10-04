@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserRole, UserStatus } from '@prisma/client';
-// import { UsersRepository } from '../repositories/users.repository'; // 임시 비활성화
+import { UsersRepository } from '../repositories/users.repository';
 
 export interface GetUsersRequest {
   page?: number;
@@ -26,13 +26,10 @@ export class GetUsersUseCase {
       throw new Error('제한값은 1~100 사이여야 합니다.');
     }
 
-    return this.usersRepository.findMany({
-      page,
-      limit,
-      role,
-      status,
-      search: search?.trim(),
-    });
+    const filters = { role, status, search: search?.trim() };
+    const pagination = { page, limit };
+
+    return this.usersRepository.findMany(filters, pagination);
   }
 }
 

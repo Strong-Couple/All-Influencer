@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { UserRole, UserStatus } from '@prisma/client';
-// import { UsersRepository, UpdateUserData } from '../repositories/users.repository'; // 임시 비활성화
+import { UsersRepository } from '../repositories/users.repository';
+import { UpdateUserData } from '../interfaces/user.interface';
 
 export interface UpdateUserRequest {
-  username?: string;
   displayName?: string;
   avatar?: string;
   bio?: string;
@@ -23,23 +23,9 @@ export class UpdateUserUseCase {
       throw new NotFoundException(`사용자를 찾을 수 없습니다. ID: ${id}`);
     }
 
-    // 사용자명 중복 확인 (변경하는 경우)
-    if (request.username && request.username !== existingUser.username) {
-      const usernameExists = await this.usersRepository.existsByUsername(request.username);
-      if (usernameExists) {
-        throw new ConflictException('이미 사용중인 사용자명입니다.');
-      }
-    }
-
-    // 웹사이트 URL 검증
-    if (request.website && !this.isValidUrl(request.website)) {
-      throw new BadRequestException('올바른 웹사이트 URL을 입력해주세요.');
-    }
-
     // 업데이트할 데이터 준비
     const updateData: any /* UpdateUserData */ = {};
     
-    if (request.username !== undefined) updateData.username = request.username;
     if (request.displayName !== undefined) updateData.displayName = request.displayName;
     if (request.avatar !== undefined) updateData.avatar = request.avatar;
     if (request.bio !== undefined) updateData.bio = request.bio;

@@ -15,7 +15,7 @@
 - [시스템 아키텍처](#-시스템-아키텍처)
 - [프로젝트 구조](#-프로젝트-구조)
 - [빠른 시작](#-빠른-시작)
-- [상세 실행 방법](#-상세-실행-방법)
+- [📚 상세 문서](#-상세-문서)
 - [데이터베이스 관리](#-데이터베이스-관리)
 - [API 문서](#-api-문서)
 - [개발 가이드](#-개발-가이드)
@@ -244,6 +244,37 @@ cd apps/web && npm run dev
 - **🏃‍♂️ 부드러운 애니메이션**: 호버, 클릭, 로딩 효과
 - **📐 일관된 디자인**: 통일된 스타일 가이드
 - **♿ 접근성**: 키보드 내비게이션, 스크린리더 지원
+
+## 📚 상세 문서
+
+프로젝트를 완전히 이해하고 효과적으로 사용하기 위해 다음 문서들을 참고하세요:
+
+### 🚀 실행 및 개발 가이드
+- **[프로젝트 실행 방법](docs/how-to-run.txt)** - 완전한 개발 환경 설정 및 실행 가이드
+- **[데이터베이스 설정](docs/database-setup.txt)** - PostgreSQL + Prisma 연결 가이드
+- **[Docker 관리](docs/docker-guide.txt)** - Docker 컨테이너 및 서비스 관리
+- **[문제 해결](docs/troubleshooting.txt)** - 자주 발생하는 문제와 해결 방법
+
+### 📋 빠른 참조
+```bash
+# 📖 전체 실행 가이드
+cat docs/how-to-run.txt
+
+# 🐳 Docker 관리 방법
+cat docs/docker-guide.txt
+
+# 🗄️ 데이터베이스 연결 설정
+cat docs/database-setup.txt
+
+# 🚨 문제 해결 가이드
+cat docs/troubleshooting.txt
+```
+
+### 🔧 개발자를 위한 핵심 정보
+- **환경 요구사항**: Node.js 18+, Docker, PostgreSQL
+- **패키지 관리자**: npm 권장 (pnpm 키 검증 문제로 인해)
+- **개발 서버**: API(3001) + Web(3000) + PostgreSQL(5432) + Adminer(8080)
+- **데이터베이스**: PostgreSQL 16 with Prisma ORM
 
 ## 🔐 OAuth 소셜 로그인 설정
 
