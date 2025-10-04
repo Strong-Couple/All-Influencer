@@ -268,6 +268,23 @@ export class AuthService {
   }
 
   /**
+   * 사용자 ID로 사용자 조회
+   */
+  async findUserById(userId: string) {
+    return this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        avatar: true,
+        role: true,
+        status: true,
+      },
+    });
+  }
+
+  /**
    * OAuth 계정 정보를 포함한 사용자 조회
    */
   async getUserWithIdentities(userId: string) {
