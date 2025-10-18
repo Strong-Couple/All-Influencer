@@ -73,7 +73,7 @@ export class AdvertiserMyPageController {
       },
     },
   })
-  async getOverview(@CurrentUser('sub') userId: string) {
+  async getOverview(@CurrentUser('id') userId: string) {
     return this.advertiserMyPageService.getOverview(userId);
   }
 
@@ -153,7 +153,7 @@ export class AdvertiserMyPageController {
     },
   })
   async getMyJobPosts(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser('id') userId: string,
     @Query() filters: JobPostFilterDto,
   ) {
     return this.advertiserMyPageService.getMyJobPosts(userId, filters);
@@ -257,7 +257,7 @@ export class AdvertiserMyPageController {
     description: '해당 공고에 대한 권한이 없음',
   })
   async getJobPostApplicants(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser('id') userId: string,
     @Param('jobPostId') jobPostId: string,
     @Query() filters: ApplicationFilterDto,
   ) {

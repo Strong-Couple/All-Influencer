@@ -13,7 +13,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
-import '../types/express';
+// Express 타입 확장을 위한 import
+import '../../../types/express';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiTags,

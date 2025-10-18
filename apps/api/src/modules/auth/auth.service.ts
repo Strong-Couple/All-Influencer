@@ -362,22 +362,5 @@ export class AuthService {
       return false;
     }
   }
-
-  /**
-   * 사용자 ID로 사용자 조회
-   */
-  async findUserById(userId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        displayName: true,
-        avatar: true,
-        role: true,
-        status: true,
-      },
-    });
-  }
 }
 

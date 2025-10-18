@@ -12,7 +12,7 @@ export interface GetUsersRequest {
 
 @Injectable()
 export class GetUsersUseCase {
-  constructor(/* private readonly usersRepository: UsersRepository */) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   async execute(request: GetUsersRequest = {}) {
     // 입력값 검증 및 기본값 설정

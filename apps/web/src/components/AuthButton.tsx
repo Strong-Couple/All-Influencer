@@ -17,7 +17,7 @@ export default function AuthButton() {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch(`${API_URL}/auth/me`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/me`, {
         credentials: 'include', // httpOnly 쿠키 포함
       });
 
@@ -41,7 +41,7 @@ export default function AuthButton() {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/logout`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });

@@ -31,7 +31,7 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const response = await fetch(`${API_URL}/auth/local/signup`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,6 +39,7 @@ export default function SignupPage() {
         credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
+          username: formData.displayName, // displayName을 username으로 사용
           password: formData.password,
           displayName: formData.displayName,
           role: formData.role,
@@ -48,8 +49,15 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (data.success) {
-        // 회원가입 성공 시 마이페이지로 이동
-        router.push('/my');
+        // 회원가입 성공 시 사용자 역할에 따라 적절한 페이지로 이동
+        const userRole = data.data?.user?.role;
+        if (userRole === 'INFLUENCER') {
+          router.push('/my/influencer');
+        } else if (userRole === 'ADVERTISER') {
+          router.push('/my/advertiser');
+        } else {
+          router.push('/my');
+        }
       } else {
         setError(data.message || '회원가입에 실패했습니다.');
       }
@@ -137,11 +145,14 @@ export default function SignupPage() {
                 name="displayName"
                 type="text"
                 required
+                minLength={3}
+                maxLength={50}
                 value={formData.displayName}
                 onChange={handleInputChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="홍길동"
               />
+              <p className="mt-1 text-xs text-gray-500">3-50자, 사용자명으로도 사용됩니다</p>
             </div>
 
             {/* 이메일 */}
@@ -180,11 +191,11 @@ export default function SignupPage() {
                   name="password"
                   type="password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={formData.password}
                   onChange={handleInputChange}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="최소 6자 이상"
+                  placeholder="최소 8자 이상"
                 />
               </div>
             </div>

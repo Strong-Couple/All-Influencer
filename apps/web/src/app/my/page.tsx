@@ -12,7 +12,7 @@ async function getUserRole() {
       return null;
     }
 
-    const response = await fetch(`${API_URL}/auth/me`, {
+    const response = await fetch(`${API_URL}/api/v1/auth/me`, {
       headers: {
         'Cookie': cookieStore.toString(),
       },

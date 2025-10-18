@@ -15,7 +15,7 @@ export default function LoginPage() {
   const handleSocialLogin = (provider: string) => {
     setIsLoading(provider);
     // API 서버의 OAuth 엔드포인트로 직접 이동
-    window.location.href = `${API_URL}/auth/${provider}`;
+    window.location.href = `${API_URL}/api/v1/auth/${provider}`;
   };
 
   const socialProviders = [

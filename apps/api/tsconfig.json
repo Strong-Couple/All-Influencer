@@ -18,7 +18,15 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"],
+      "@/types/*": ["./types/*"],
+      "@/common/*": ["./common/*"],
+      "@/modules/*": ["./modules/*"],
+      "@/config/*": ["./config/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]

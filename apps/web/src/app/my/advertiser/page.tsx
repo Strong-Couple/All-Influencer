@@ -19,7 +19,7 @@ async function getAdvertiserOverview() {
   try {
     const cookieStore = cookies();
     
-    const response = await fetch(`${API_URL}/my/advertiser/overview`, {
+    const response = await fetch(`${API_URL}/api/v1/my/advertiser/overview`, {
       headers: {
         'Cookie': cookieStore.toString(),
       },
@@ -31,7 +31,8 @@ async function getAdvertiserOverview() {
     }
 
     if (response.ok) {
-      return await response.json();
+      const result = await response.json();
+      return result.success ? result.data : null;
     }
 
     console.error('Failed to fetch advertiser overview:', response.statusText);

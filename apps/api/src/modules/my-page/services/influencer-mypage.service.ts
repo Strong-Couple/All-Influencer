@@ -23,7 +23,7 @@ export class InfluencerMyPageService {
   async getOverview(userId: string) {
     try {
       // 인플루언서 프로필 확인
-      const influencerProfile = await this.prisma.influencerProfile.findUnique({
+      let influencerProfile = await this.prisma.influencerProfile.findUnique({
         where: { userId },
         include: {
           channels: true,
@@ -31,7 +31,31 @@ export class InfluencerMyPageService {
       });
 
       if (!influencerProfile) {
-        throw new NotFoundException('인플루언서 프로필을 찾을 수 없습니다.');
+        // 프로필이 없으면 자동으로 생성
+        this.logger.log(`Creating missing influencer profile for user ${userId}`);
+        const newProfile = await this.prisma.influencerProfile.create({
+          data: {
+            userId,
+            categories: [],
+            followers: 0,
+            avgEngagement: 0.0,
+            languages: ['ko'],
+            skills: [],
+            portfolioUrls: [],
+          },
+        });
+        
+        // 새로 생성된 프로필로 다시 조회
+        influencerProfile = await this.prisma.influencerProfile.findUnique({
+          where: { userId },
+          include: {
+            channels: true,
+          },
+        });
+        
+        if (!influencerProfile) {
+          throw new NotFoundException('인플루언서 프로필을 생성할 수 없습니다.');
+        }
       }
 
       // 지원 현황 카운트
@@ -109,12 +133,33 @@ export class InfluencerMyPageService {
    */
   async getResume(userId: string) {
     try {
-      const influencerProfile = await this.prisma.influencerProfile.findUnique({
+      let influencerProfile = await this.prisma.influencerProfile.findUnique({
         where: { userId },
       });
 
       if (!influencerProfile) {
-        throw new NotFoundException('인플루언서 프로필을 찾을 수 없습니다.');
+        // 프로필이 없으면 자동으로 생성
+        this.logger.log(`Creating missing influencer profile for user ${userId}`);
+        await this.prisma.influencerProfile.create({
+          data: {
+            userId,
+            categories: [],
+            followers: 0,
+            avgEngagement: 0.0,
+            languages: ['ko'],
+            skills: [],
+            portfolioUrls: [],
+          },
+        });
+        
+        // 새로 생성된 프로필로 다시 조회
+        influencerProfile = await this.prisma.influencerProfile.findUnique({
+          where: { userId },
+        });
+        
+        if (!influencerProfile) {
+          throw new NotFoundException('인플루언서 프로필을 생성할 수 없습니다.');
+        }
       }
 
       return {
@@ -140,12 +185,33 @@ export class InfluencerMyPageService {
    */
   async updateResume(userId: string, updateData: UpdateInfluencerResumeDto) {
     try {
-      const influencerProfile = await this.prisma.influencerProfile.findUnique({
+      let influencerProfile = await this.prisma.influencerProfile.findUnique({
         where: { userId },
       });
 
       if (!influencerProfile) {
-        throw new NotFoundException('인플루언서 프로필을 찾을 수 없습니다.');
+        // 프로필이 없으면 자동으로 생성
+        this.logger.log(`Creating missing influencer profile for user ${userId}`);
+        await this.prisma.influencerProfile.create({
+          data: {
+            userId,
+            categories: [],
+            followers: 0,
+            avgEngagement: 0.0,
+            languages: ['ko'],
+            skills: [],
+            portfolioUrls: [],
+          },
+        });
+        
+        // 새로 생성된 프로필로 다시 조회
+        influencerProfile = await this.prisma.influencerProfile.findUnique({
+          where: { userId },
+        });
+        
+        if (!influencerProfile) {
+          throw new NotFoundException('인플루언서 프로필을 생성할 수 없습니다.');
+        }
       }
 
       const updatedProfile = await this.prisma.influencerProfile.update({

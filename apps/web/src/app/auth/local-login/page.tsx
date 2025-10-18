@@ -22,7 +22,7 @@ export default function LocalLoginPage() {
     setError('');
 
     try {
-      const response = await fetch(`${API_URL}/auth/local/login`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,8 +34,15 @@ export default function LocalLoginPage() {
       const data = await response.json();
 
       if (data.success) {
-        // 로그인 성공 시 마이페이지로 이동
-        router.push('/my');
+        // 로그인 성공 시 사용자 역할에 따라 적절한 페이지로 이동
+        const userRole = data.data?.user?.role;
+        if (userRole === 'INFLUENCER') {
+          router.push('/my/influencer');
+        } else if (userRole === 'ADVERTISER') {
+          router.push('/my/advertiser');
+        } else {
+          router.push('/my');
+        }
       } else {
         setError(data.message || '로그인에 실패했습니다.');
       }

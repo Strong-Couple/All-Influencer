@@ -14,7 +14,7 @@ export interface UpdateUserRequest {
 
 @Injectable()
 export class UpdateUserUseCase {
-  constructor(/* private readonly usersRepository: UsersRepository */) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   async execute(id: string, request: UpdateUserRequest) {
     // 사용자 존재 확인

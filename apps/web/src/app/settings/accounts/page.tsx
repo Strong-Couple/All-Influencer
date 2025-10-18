@@ -35,7 +35,7 @@ export default function AccountsPage() {
 
   const fetchAccountInfo = async () => {
     try {
-      const response = await fetch(`${API_URL}/auth/link`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/link`, {
         credentials: 'include',
       });
 
@@ -56,7 +56,7 @@ export default function AccountsPage() {
   const handleConnectAccount = (provider: string) => {
     setActionLoading(`connect-${provider}`);
     // API 서버의 계정 연결 엔드포인트로 이동
-    window.location.href = `${API_URL}/auth/link/${provider}`;
+    window.location.href = `${API_URL}/api/v1/auth/link/${provider}`;
   };
 
   const handleDisconnectAccount = async (provider: string) => {

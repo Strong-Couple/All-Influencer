@@ -80,7 +80,7 @@ export class InfluencerMyPageController {
       },
     },
   })
-  async getOverview(@CurrentUser('sub') userId: string) {
+  async getOverview(@CurrentUser('id') userId: string) {
     return this.influencerMyPageService.getOverview(userId);
   }
 
@@ -93,7 +93,7 @@ export class InfluencerMyPageController {
     status: 200,
     description: '이력서 정보 조회 성공',
   })
-  async getResume(@CurrentUser('sub') userId: string) {
+  async getResume(@CurrentUser('id') userId: string) {
     return this.influencerMyPageService.getResume(userId);
   }
 
@@ -107,7 +107,7 @@ export class InfluencerMyPageController {
     description: '이력서 수정 성공',
   })
   async updateResume(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser('id') userId: string,
     @Body() updateData: UpdateInfluencerResumeDto,
   ) {
     return this.influencerMyPageService.updateResume(userId, updateData);
@@ -141,7 +141,7 @@ export class InfluencerMyPageController {
     description: '지원 현황 조회 성공',
   })
   async getMyApplications(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser('id') userId: string,
     @Query() filters: ApplicationFilterDto,
   ) {
     return this.influencerMyPageService.getMyApplications(userId, filters);
@@ -169,7 +169,7 @@ export class InfluencerMyPageController {
     description: '스크랩 목록 조회 성공',
   })
   async getMyScraps(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser('id') userId: string,
     @Query() pagination: PaginationDto,
   ) {
     return this.influencerMyPageService.getMyScraps(userId, pagination);
@@ -189,7 +189,7 @@ export class InfluencerMyPageController {
     description: '이미 스크랩한 공고',
   })
   async createScrap(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser('id') userId: string,
     @Body() createScrapDto: CreateScrapDto,
   ) {
     return this.influencerMyPageService.createScrap(userId, createScrapDto.jobPostId);
@@ -213,7 +213,7 @@ export class InfluencerMyPageController {
     description: '스크랩을 찾을 수 없음',
   })
   async deleteScrap(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser('id') userId: string,
     @Param('jobPostId') jobPostId: string,
   ) {
     return this.influencerMyPageService.deleteScrap(userId, jobPostId);

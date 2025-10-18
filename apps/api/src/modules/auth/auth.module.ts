@@ -8,6 +8,7 @@ import { PrismaModule } from '../../common/database/prisma.module';
 
 // Controllers
 import { AuthController } from './auth.controller';
+// OAuth controllers - conditionally loaded based on environment
 import { OAuthController } from './controllers/oauth.controller';
 import { AccountLinkController } from './controllers/account-link.controller';
 import { LocalAuthController } from './local/local.controller';
@@ -26,6 +27,7 @@ import { EncryptionUtil } from '../../common/utils/encryption.util';
 // Guards & Strategies
 import { JwtAuthGuard, RolesGuard } from './guards';
 import { JwtStrategy } from './strategies/jwt.strategy';
+// OAuth strategies - conditionally loaded based on environment
 import { GoogleStrategy } from './strategies/google.strategy';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { NaverStrategy } from './strategies/naver.strategy';
@@ -46,9 +48,9 @@ import { NaverStrategy } from './strategies/naver.strategy';
   ],
   controllers: [
     AuthController,
-    OAuthController,
-    AccountLinkController,
     LocalAuthController,
+    // OAuth controllers - conditionally loaded
+    ...(process.env.ENABLE_OAUTH === 'true' ? [OAuthController, AccountLinkController] : []),
   ],
   providers: [
     // Core Services
@@ -68,9 +70,8 @@ import { NaverStrategy } from './strategies/naver.strategy';
     
     // Strategies
     JwtStrategy,
-    GoogleStrategy,
-    KakaoStrategy,
-    NaverStrategy,
+    // OAuth strategies - conditionally loaded
+    ...(process.env.ENABLE_OAUTH === 'true' ? [GoogleStrategy, KakaoStrategy, NaverStrategy] : []),
   ],
   exports: [
     AuthService,

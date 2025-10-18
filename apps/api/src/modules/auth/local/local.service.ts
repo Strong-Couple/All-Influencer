@@ -171,7 +171,17 @@ export class LocalAuthService {
   private async createRoleProfile(userId: string, role: 'INFLUENCER' | 'ADVERTISER') {
     try {
       if (role === 'INFLUENCER') {
-        await this.prisma.influencerProfile.create({
+        // 기존 프로필이 있는지 확인
+        const existingProfile = await this.prisma.influencerProfile.findUnique({
+          where: { userId },
+        });
+
+        if (existingProfile) {
+          this.logger.log(`Influencer profile already exists for user ${userId}`);
+          return;
+        }
+
+        const profile = await this.prisma.influencerProfile.create({
           data: {
             userId,
             categories: [],
@@ -182,17 +192,31 @@ export class LocalAuthService {
             portfolioUrls: [],
           },
         });
+
+        this.logger.log(`Created influencer profile for user ${userId}: ${profile.id}`);
       } else if (role === 'ADVERTISER') {
-        await this.prisma.advertiserCompany.create({
+        // 기존 회사 정보가 있는지 확인
+        const existingCompany = await this.prisma.advertiserCompany.findUnique({
+          where: { userId },
+        });
+
+        if (existingCompany) {
+          this.logger.log(`Advertiser company already exists for user ${userId}`);
+          return;
+        }
+
+        const company = await this.prisma.advertiserCompany.create({
           data: {
             userId,
             companyName: '미설정',
             industry: '미분류',
           },
         });
+
+        this.logger.log(`Created advertiser company for user ${userId}: ${company.id}`);
       }
     } catch (error) {
-      this.logger.warn(`Failed to create profile for role ${role}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(`Failed to create profile for role ${role} (userId: ${userId}): ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
       // 프로필 생성 실패는 치명적이지 않으므로 에러를 던지지 않음
     }
   }
