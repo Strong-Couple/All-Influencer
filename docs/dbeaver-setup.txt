@@ -1,0 +1,212 @@
+# All-Influencer Platform - DBeaver 연결 가이드
+
+이 문서는 All-Influencer 플랫폼의 PostgreSQL 데이터베이스에 DBeaver를 사용하여 연결하는 방법을 설명합니다.
+
+## 1. DBeaver 설치
+
+### macOS
+```bash
+# Homebrew를 통한 설치 (권장)
+brew install --cask dbeaver-community
+
+# 또는 공식 웹사이트에서 다운로드
+# https://dbeaver.io/download/
+```
+
+### Windows
+1. https://dbeaver.io/download/ 접속
+2. "Windows (installer)" 다운로드
+3. 다운로드한 .exe 파일 실행하여 설치
+
+### Linux (Ubuntu/Debian)
+```bash
+# Snap을 통한 설치
+sudo snap install dbeaver-ce
+
+# 또는 .deb 패키지 다운로드 후 설치
+wget https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
+sudo dpkg -i dbeaver-ce_latest_amd64.deb
+```
+
+## 2. PostgreSQL 데이터베이스 실행
+
+DBeaver 연결 전에 먼저 PostgreSQL 컨테이너를 실행해야 합니다.
+
+```bash
+# 프로젝트 루트 디렉토리에서
+cd /Users/hanjiung/Documents/portfolio/All-influencer
+
+# PostgreSQL 컨테이너 실행
+docker compose up -d
+
+# 컨테이너 상태 확인
+docker ps
+# allinfluencer-postgres 컨테이너가 "Up" 상태인지 확인
+
+# 데이터베이스 연결 테스트
+docker exec -it allinfluencer-postgres pg_isready -U allinfluencer -d allinfluencer
+```
+
+## 3. DBeaver에서 PostgreSQL 연결 설정
+
+### Step 1: 새 연결 생성
+1. DBeaver 실행
+2. 상단 메뉴에서 **Database** > **New Database Connection** 클릭
+3. 또는 좌측 상단의 **플러그 아이콘(+)** 클릭
+
+### Step 2: 데이터베이스 타입 선택
+1. **PostgreSQL** 선택
+2. **Next** 클릭
+
+### Step 3: 연결 정보 입력
+다음 정보를 정확히 입력하세요:
+
+```
+Server Host: localhost
+Port: 5432
+Database: allinfluencer
+Username: allinfluencer
+Password: allinfluencer
+```
+
+**상세 설정**:
+- **Server Host**: `localhost` (또는 `127.0.0.1`)
+- **Port**: `5432`
+- **Database**: `allinfluencer`
+- **Username**: `allinfluencer`
+- **Password**: `allinfluencer`
+- **Show all databases**: 체크 해제 (선택사항)
+
+### Step 4: 연결 테스트
+1. **Test Connection** 버튼 클릭
+2. "Connected" 메시지가 나타나면 성공
+3. 만약 오류가 발생하면:
+   - Docker 컨테이너가 실행 중인지 확인
+   - 포트 5432가 사용 가능한지 확인
+   - 방화벽 설정 확인
+
+### Step 5: 연결 완료
+1. **Finish** 클릭
+2. 좌측 **Database Navigator**에 연결이 나타남
+3. 연결명을 더블클릭하여 데이터베이스에 접속
+
+## 4. 데이터베이스 구조 확인
+
+연결 후 다음과 같은 구조를 확인할 수 있습니다:
+
+```
+allinfluencer (데이터베이스)
+├── Schemas
+│   └── public
+│       ├── Tables
+│       │   ├── User
+│       │   ├── UserIdentity
+│       │   ├── RefreshSession
+│       │   ├── InfluencerProfile
+│       │   ├── AdvertiserCompany
+│       │   ├── Channel
+│       │   ├── JobPost
+│       │   ├── Application
+│       │   └── ... (기타 테이블들)
+│       └── Views (뷰가 있는 경우)
+```
+
+## 5. 기본 사용법
+
+### 테이블 데이터 조회
+1. **Tables** > **User** 우클릭
+2. **View Data** 선택
+3. 또는 테이블을 더블클릭
+
+### SQL 쿼리 실행
+1. 상단 **SQL Editor** 아이콘 클릭 (또는 Ctrl+])
+2. SQL 쿼리 작성:
+```sql
+-- 사용자 목록 조회
+SELECT id, email, "displayName", role, status, "createdAt" 
+FROM "User" 
+ORDER BY "createdAt" DESC;
+
+-- 인플루언서 프로필 조회
+SELECT u."displayName", ip.categories, ip.followers, ip."avgEngagement"
+FROM "User" u
+JOIN "InfluencerProfile" ip ON u.id = ip."userId"
+WHERE u.role = 'INFLUENCER';
+```
+3. **Ctrl+Enter** 또는 **실행 버튼** 클릭
+
+### 데이터 편집
+1. 테이블 데이터 뷰에서 셀을 더블클릭
+2. 값 수정 후 **Enter**
+3. **Ctrl+S**로 변경사항 저장
+
+## 6. 유용한 기능들
+
+### ER 다이어그램 생성
+1. 데이터베이스 우클릭
+2. **Generate ER Diagram** 선택
+3. 테이블 간의 관계를 시각적으로 확인
+
+### 데이터 내보내기/가져오기
+1. 테이블 우클릭
+2. **Export Data** 또는 **Import Data** 선택
+3. CSV, JSON, SQL 등 다양한 형식 지원
+
+### SQL 히스토리
+1. **Window** > **Show View** > **SQL History**
+2. 이전에 실행한 쿼리들 확인 및 재사용
+
+## 7. 문제 해결
+
+### 연결 실패 시
+```bash
+# 1. Docker 컨테이너 상태 확인
+docker ps -a
+
+# 2. PostgreSQL 로그 확인
+docker logs allinfluencer-postgres
+
+# 3. 포트 사용 확인
+lsof -i :5432
+
+# 4. 컨테이너 재시작
+docker compose down
+docker compose up -d
+```
+
+### 권한 오류 시
+```sql
+-- DBeaver에서 실행
+GRANT ALL PRIVILEGES ON DATABASE allinfluencer TO allinfluencer;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO allinfluencer;
+```
+
+### 성능 최적화
+1. **Window** > **Preferences**
+2. **General** > **Editors** > **SQL Editor**
+3. **Result Set** 탭에서:
+   - **Max rows**: 1000 (기본값)
+   - **Query timeout**: 30초
+
+## 8. 보안 고려사항
+
+### 프로덕션 환경에서
+- 기본 비밀번호 변경 필수
+- SSL 연결 사용 권장
+- 방화벽 설정으로 접근 제한
+- 읽기 전용 사용자 계정 생성 고려
+
+### 로컬 개발 환경에서
+- 현재 설정은 로컬 개발용입니다
+- 외부 네트워크에서 접근 불가능하도록 설정됨
+- Docker 컨테이너 내부에서만 접근 가능
+
+## 9. 추가 리소스
+
+- **DBeaver 공식 문서**: https://dbeaver.io/docs/
+- **PostgreSQL 문서**: https://www.postgresql.org/docs/
+- **프로젝트 문서**: [../README.md](../README.md)
+
+---
+
+**참고**: 이 설정은 로컬 개발 환경을 위한 것입니다. 프로덕션 환경에서는 보안 설정을 강화해야 합니다.
