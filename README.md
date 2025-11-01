@@ -3,8 +3,10 @@
 > **🚀 인플루언서와 브랜드를 연결하는 풀스택 플랫폼**  
 > Next.js + NestJS + PostgreSQL + Prisma를 활용한 모노레포 아키텍처
 
-![프로젝트 상태](https://img.shields.io/badge/상태-개발완료-brightgreen)
+![프로젝트 상태](https://img.shields.io/badge/상태-개발중-yellow)
 ![기술스택](https://img.shields.io/badge/Tech_Stack-TypeScript-blue)
+![Node.js](https://img.shields.io/badge/Node.js-v20.11.1-green)
+![npm](https://img.shields.io/badge/npm-v10.8.3-red)
 ![라이센스](https://img.shields.io/badge/license-MIT-green)
 
 ## 📋 목차
@@ -95,7 +97,7 @@
 ### DevOps & Tools
 - **Docker**: 컨테이너화, 개발 환경 통일
 - **Turborepo**: 모노레포 빌드 시스템
-- **pnpm**: 효율적인 패키지 관리자
+- **npm**: 패키지 관리자 (pnpm 키 검증 문제로 대체)
 - **ESLint + Prettier**: 코드 품질 관리
 - **Husky**: Git hooks, 커밋 전 검증
 
@@ -163,10 +165,10 @@ All-influencer/
 ## 🚀 빠른 시작
 
 ### 전제 조건
-- **Node.js**: 18.0.0 이상
+- **Node.js**: 18.0.0 이상 (현재: ✅ v20.11.1)
+- **npm**: 8.0.0 이상 (현재: ✅ v10.8.3)
 - **Docker Desktop**: 데이터베이스 및 관리도구 실행용
 - **Git**: 버전 관리
-- **Chrome/Safari**: 최적 브라우저 환경
 
 ### ⚡ 1분 실행 가이드
 
@@ -176,39 +178,54 @@ git clone https://github.com/Strong-Couple/All-Influencer.git
 cd All-influencer
 
 # 2. 데이터베이스 실행 (PostgreSQL + Adminer)
-docker compose -f db/postgres/docker-compose.yml up -d
+docker compose up -d
 
-# 3. 웹 앱 실행 (현재 temp-api 포함)
-cd apps/web
+# 3. 의존성 설치 (현재 npm 권장)
 npm install
+
+# 4. 누락된 패키지 설치
+cd apps/web
+npm install @heroicons/react@^2.2.0
+npm install @swc/helpers
+cd ../..
+
+# 5. 웹 앱만 실행 (API는 현재 빌드 오류)
+cd apps/web
 npm run dev
 ```
 
-### 🎯 모든 것을 한 번에 실행
+### 🎯 현재 개발 상황
+
+**⚠️ 중요**: 현재 NestJS API 서버에 39개의 TypeScript 컴파일 오류가 있어 실행이 불가능한 상태입니다.
+
+**현재 작동하는 부분**:
+- ✅ Next.js 웹 애플리케이션 (포트 3000)
+- ✅ PostgreSQL 데이터베이스 (포트 5432)  
+- ✅ Adminer 데이터베이스 GUI (포트 8080)
+
+**현재 작동하지 않는 부분**:
+- ❌ NestJS API 서버 (포트 3001) - 컴파일 오류
+- ❌ temp-api (제거됨)
 
 ```bash
+# 현재 실행 가능한 서비스들
 # 터미널 1: 데이터베이스 시작
-docker compose -f db/postgres/docker-compose.yml up -d
+docker compose up -d
 
-# 터미널 2: 임시 API 서버 (현재 사용중)
-cd temp-api && npm start
-
-# 터미널 3: 웹 애플리케이션  
+# 터미널 2: 웹 애플리케이션만 실행
 cd apps/web && npm run dev
 ```
 
 ### 🌟 결과 확인
 
-| 서비스 | URL | 설명 |
-|--------|-----|------|
-| 🌐 **메인 플랫폼** | http://localhost:3000 | 완전히 새롭게 디자인된 UI |
-| 📋 **구인공고** | http://localhost:3000/jobs | 스와이프 슬라이드 + 혼합 레이아웃 |
-| 👥 **사용자 목록** | http://localhost:3000/users | 고급 검색 및 필터링 |
-| 🏠 **마이페이지** | http://localhost:3000/my | 역할별 대시보드 |
-| 🔧 **API 서버** | http://localhost:3001 | 임시 API (완전 기능) |
-| 🗃 **데이터 관리** | http://localhost:8080 | Adminer DB GUI |
+| 서비스 | URL | 상태 | 설명 |
+|--------|-----|------|------|
+| 🌐 **메인 플랫폼** | http://localhost:3000 | ✅ 작동 | Next.js 웹 애플리케이션 |
+| 🔧 **API 서버** | http://localhost:3001 | ❌ 오류 | NestJS API (컴파일 오류) |
+| 🗃 **데이터 관리** | DBeaver 사용 | ✅ 권장 | PostgreSQL GUI 클라이언트 |
+| 🐘 **PostgreSQL** | localhost:5432 | ✅ 작동 | 데이터베이스 서버 |
 
-🎉 **이제 완전히 업그레이드된 All-Influencer 플랫폼을 체험해보세요!**
+🎉 **웹 애플리케이션은 정상 작동합니다!** (API 연동 기능은 제한적)
 
 ## 🆕 새로운 기능 하이라이트
 
@@ -252,6 +269,7 @@ cd apps/web && npm run dev
 ### 🚀 실행 및 개발 가이드
 - **[프로젝트 실행 방법](docs/how-to-run.txt)** - 완전한 개발 환경 설정 및 실행 가이드
 - **[데이터베이스 설정](docs/database-setup.txt)** - PostgreSQL + Prisma 연결 가이드
+- **[DBeaver 연결 가이드](docs/dbeaver-setup.txt)** - DBeaver를 사용한 데이터베이스 관리
 - **[Docker 관리](docs/docker-guide.txt)** - Docker 컨테이너 및 서비스 관리
 - **[문제 해결](docs/troubleshooting.txt)** - 자주 발생하는 문제와 해결 방법
 
@@ -266,15 +284,31 @@ cat docs/docker-guide.txt
 # 🗄️ 데이터베이스 연결 설정
 cat docs/database-setup.txt
 
+# 🔧 DBeaver 연결 방법
+cat docs/dbeaver-setup.txt
+
 # 🚨 문제 해결 가이드
 cat docs/troubleshooting.txt
 ```
 
-### 🔧 개발자를 위한 핵심 정보
-- **환경 요구사항**: Node.js 18+, Docker, PostgreSQL
-- **패키지 관리자**: npm 권장 (pnpm 키 검증 문제로 인해)
-- **개발 서버**: API(3001) + Web(3000) + PostgreSQL(5432) + Adminer(8080)
-- **데이터베이스**: PostgreSQL 16 with Prisma ORM
+### 🔧 현재 개발 환경 정보
+- **Node.js**: v20.11.1 ✅
+- **npm**: v10.8.3 ✅  
+- **pnpm**: ❌ 키 검증 오류 (npm 사용 권장)
+- **패키지 관리자**: npm 권장 (workspace 호환성)
+- **개발 서버**: Web(3000) + PostgreSQL(5432)
+- **데이터베이스**: PostgreSQL 16 with DBeaver GUI
+- **API 서버**: ❌ 현재 빌드 불가 (39개 컴파일 오류)
+
+### ⚠️ 알려진 문제점
+1. **NestJS API 컴파일 오류 (39개)** ❌ - 현재 최우선 해결 과제
+   - `AuthService.findUserById` 중복 구현
+   - Prisma 스키마 불일치 (`skills`, `headline`, `bio` 등 필드 누락)
+   - `scrap` 모델 누락
+   - `UsersRepository` 의존성 주입 오류
+2. **pnpm corepack 키 검증 실패** - npm 사용으로 해결
+3. **@heroicons/react 모듈 누락** - 수동 설치 필요
+4. **monorepo workspace 설정 충돌** - 개별 npm install 권장
 
 ## 🔐 OAuth 소셜 로그인 설정
 
@@ -655,61 +689,119 @@ NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 
 ## 🚨 문제 해결
 
-### 자주 발생하는 문제
+### 현재 최우선 해결 과제
 
-#### 1. pnpm 설치 문제
+#### 1. NestJS API 컴파일 오류 (39개) ❌
 ```bash
-# 해결: Corepack 사용
-corepack enable
-```
-
-#### 2. workspace: 프로토콜 에러
-```bash
-# 해결: 개별 npm install
-cd apps/web && npm install
-cd ../api && npm install
-```
-
-#### 3. 데이터베이스 연결 실패
-```bash
-# 해결: Docker 컨테이너 상태 확인
-docker compose ps
-docker compose logs postgres
-```
-
-#### 4. UI 컴포넌트 에러
-```bash
-# 현재 상태: 간단한 HTML/CSS로 구현됨
-# UI 패키지 의존성 문제로 인한 임시 조치
-```
-
-#### 5. 포트 충돌
-```bash
-# 해결: 사용 중인 포트 확인
-lsof -i :3000
-lsof -i :3001
-lsof -i :5432
-```
-
-### 로그 확인
-```bash
-# Docker 로그
-docker compose logs -f
-
-# 애플리케이션 로그
-cd apps/web && npm run dev  # 웹 앱 로그
-cd apps/api && npm run dev  # API 로그
-```
-
-### 디버깅 모드
-```bash
-# API 디버깅
+# 문제: 현재 API 서버가 실행되지 않음
 cd apps/api
-npm run start:debug
+npm run build  # 39개 오류 발생
 
-# Next.js 디버깅
+# 주요 오류들:
+# - AuthService.findUserById 중복 구현
+# - Prisma 스키마 불일치 (skills, headline, bio 등 필드 누락)
+# - scrap 모델 누락
+# - UsersRepository 의존성 주입 오류
+```
+
+#### 2. @heroicons/react 모듈 누락 ❌
+```bash
+# 문제: Module not found: Can't resolve '@heroicons/react/24/outline'
+# 해결: 수동 설치
 cd apps/web
-npm run dev -- --inspect
+npm install @heroicons/react@^2.2.0
+npm install @swc/helpers  # 추가 필요 패키지
+```
+
+#### 3. pnpm 키 검증 오류 ❌
+```bash
+# 문제: Error: Cannot find matching keyid
+# 해결: npm 사용으로 우회
+npm install  # pnpm 대신 사용
+```
+
+### 현재 작동하는 기능
+
+#### ✅ 웹 애플리케이션 (포트 3000)
+```bash
+cd apps/web
+npm run dev
+# 접속: http://localhost:3000
+```
+
+#### ✅ 데이터베이스 환경 (포트 5432)
+```bash
+# PostgreSQL 실행
+docker compose up -d
+
+# DBeaver 연결 정보:
+# - Host: localhost
+# - Port: 5432
+# - Database: allinfluencer
+# - Username: allinfluencer
+# - Password: allinfluencer
+
+# 자세한 DBeaver 설정 방법:
+cat docs/dbeaver-setup.txt
+```
+
+### API 서버 복구 계획
+
+1. **Prisma 스키마 수정** - 누락된 필드들 추가
+2. **AuthService 중복 메서드 제거**
+3. **UsersRepository 의존성 주입 수정**
+4. **scrap 모델 추가**
+5. **마이그레이션 재실행**
+
+### 추가 문제 해결 방법
+
+#### 포트 충돌
+```bash
+# 사용 중인 포트 확인
+lsof -i :3000  # Next.js
+lsof -i :3001  # API 서버
+lsof -i :5432  # PostgreSQL
+lsof -i :8080  # Adminer
+
+# 프로세스 종료
+kill -9 <PID>
+```
+
+#### Docker 컨테이너 문제
+```bash
+# 컨테이너 상태 확인
+docker ps -a
+
+# 컨테이너 재시작
+docker compose down
+docker compose up -d
+
+# 로그 확인
+docker compose logs -f
+```
+
+#### 캐시 문제
+```bash
+# npm 캐시 정리
+npm cache clean --force
+
+# Next.js 캐시 정리
+cd apps/web
+rm -rf .next
+npm run dev
+```
+
+### 로그 확인 방법
+```bash
+# 웹 앱 로그
+cd apps/web && npm run dev
+
+# Docker 로그
+docker compose logs -f postgres
+docker compose logs -f adminer
+
+# 시스템 로그
+tail -f /var/log/system.log  # macOS
 ```
 
 ## 🤝 기여하기
@@ -726,12 +818,28 @@ npm run dev -- --inspect
 
 ## 📞 연락처
 
-- **개발팀**: dev@allinfluencer.com
-- **GitHub**: https://github.com/your-org/all-influencer
-- **문서**: https://docs.allinfluencer.com
+- **GitHub Repository**: https://github.com/Strong-Couple/All-Influencer
+- **개발 문서**: [docs/](docs/) 폴더 참조
+- **이슈 리포팅**: GitHub Issues 활용
 
 ---
 
-**⚡ 빠른 시작**: `docker compose up -d && cd apps/web && npm install && npm run dev`
+**⚡ 빠른 시작**: `docker compose up -d && cd apps/web && npm install @heroicons/react @swc/helpers && npm run dev`
 
-🎉 **프로젝트 실행 완료!** [http://localhost:3000](http://localhost:3000)에서 확인하세요.
+🎉 **웹 애플리케이션 실행 완료!** [http://localhost:3000](http://localhost:3000)에서 확인하세요.
+
+⚠️ **참고**: API 서버는 현재 컴파일 오류로 인해 실행되지 않습니다. 웹 UI는 정상 작동하지만 API 연동 기능은 제한적입니다.
+
+### 📋 현재 상황 체크리스트
+- [ ] Docker 실행: `docker compose up -d`
+- [ ] 웹 의존성 설치: `cd apps/web && npm install`
+- [ ] Heroicons 설치: `npm install @heroicons/react @swc/helpers`
+- [ ] 웹 서버 실행: `npm run dev`
+- [ ] 브라우저 접속: http://localhost:3000
+- [ ] ❌ API 서버: 현재 빌드 불가 (39개 오류)
+
+### 🔧 개발자를 위한 현재 상황
+- **작동 중**: 웹 앱, PostgreSQL 데이터베이스
+- **권장 도구**: DBeaver (데이터베이스 GUI)
+- **중단됨**: NestJS API 서버, temp-api (제거됨), Adminer (제거됨)
+- **다음 단계**: API 서버 컴파일 오류 해결 필요

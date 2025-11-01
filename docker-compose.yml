@@ -21,19 +21,6 @@ services:
       timeout: 5s
       retries: 5
 
-  adminer:
-    image: adminer:4-standalone
-    container_name: allinfluencer-adminer
-    restart: unless-stopped
-    environment:
-      ADMINER_DEFAULT_SERVER: postgres
-      ADMINER_DESIGN: dracula
-    ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-
 volumes:
   postgres_data:
     driver: local
