@@ -37,7 +37,7 @@ class SDKGenerator {
    */
   async fetchOpenAPISchema(): Promise<any> {
     try {
-      console.log(`📡 OpenAPI 스키마를 가져오는 중... ${this.API_URL}/api-json`);
+      console.log(`[API] OpenAPI 스키마를 가져오는 중... ${this.API_URL}/api-json`);
       
       const response = await axios.get(`${this.API_URL}/api-json`, {
         timeout: 10000,
@@ -50,7 +50,7 @@ class SDKGenerator {
         throw new Error('유효하지 않은 OpenAPI 스키마');
       }
 
-      console.log('✅ OpenAPI 스키마 가져오기 성공');
+      console.log('[OK] OpenAPI 스키마 가져오기 성공');
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -59,7 +59,10 @@ class SDKGenerator {
         }
         throw new Error(`API 요청 실패: ${error.message}`);
       }
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('알 수 없는 에러가 발생했습니다.');
     }
   }
 
@@ -67,7 +70,7 @@ class SDKGenerator {
    * openapi-typescript를 사용하여 타입 생성
    */
   async generateTypes(schema: any): Promise<void> {
-    console.log('🔧 TypeScript 타입을 생성하는 중...');
+    console.log('[WORK] TypeScript 타입을 생성하는 중...');
 
     try {
       // 스키마를 임시 파일로 저장
@@ -83,9 +86,12 @@ class SDKGenerator {
         fs.unlinkSync(tempSchemaFile);
       }
 
-      console.log('✅ TypeScript 타입 생성 완료');
+      console.log('[OK] TypeScript 타입 생성 완료');
     } catch (error) {
-      throw new Error(`타입 생성 실패: ${error.message}`);
+      if (error instanceof Error) {
+        throw new Error(`타입 생성 실패: ${error.message}`);
+      }
+      throw new Error('타입 생성 실패: 알 수 없는 에러');
     }
   }
 
@@ -93,7 +99,7 @@ class SDKGenerator {
    * Axios 기반 클라이언트 생성
    */
   generateAxiosClient(): void {
-    console.log('🔧 Axios 클라이언트를 생성하는 중...');
+    console.log('[WORK] Axios 클라이언트를 생성하는 중...');
 
     const clientCode = `/**
  * 자동 생성된 API 클라이언트
@@ -123,6 +129,7 @@ export class AllInfluencerApiClient {
     this.client = axios.create({
       baseURL: config.baseURL || 'http://localhost:3001/api/v1',
       timeout: config.timeout || 10000,
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
         ...config.headers,
@@ -143,7 +150,7 @@ export class AllInfluencerApiClient {
           config.headers.Authorization = \`Bearer \${this.tokens.accessToken}\`;
         }
         
-        console.log(\`🔄 [\${config.method?.toUpperCase()}] \${config.url}\`);
+        console.log(\`[REQ] [\${config.method?.toUpperCase()}] \${config.url}\`);
         return config;
       },
       (error) => Promise.reject(error)
@@ -152,7 +159,7 @@ export class AllInfluencerApiClient {
     // 응답 인터셉터: 401 에러 시 토큰 갱신
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
-        console.log(\`✅ [\${response.status}] \${response.config.url}\`);
+        console.log(\`[OK] [\${response.status}] \${response.config.url}\`);
         return response;
       },
       async (error) => {
@@ -172,8 +179,11 @@ export class AllInfluencerApiClient {
           }
         }
 
-        console.error(\`❌ [\${error.response?.status || 'Network'}] \${originalRequest?.url}\`, 
-                     error.response?.data || error.message);
+        // 401 에러는 로그인하지 않은 상태에서 정상적인 응답이므로 조용히 처리
+        if (error.response?.status !== 401) {
+          console.error(\`[FAIL] [\${error.response?.status || 'Network'}] \${originalRequest?.url}\`, 
+                       error.response?.data || error.message);
+        }
         return Promise.reject(error);
       }
     );
@@ -374,7 +384,7 @@ export const usersApi = {
 `;
 
     writeFileSync(this.CLIENT_FILE, clientCode);
-    console.log('✅ Axios 클라이언트 생성 완료');
+    console.log('[OK] Axios 클라이언트 생성 완료');
   }
 
   /**
@@ -392,7 +402,7 @@ export type * from './api-types';
 
     const indexFile = join(this.OUTPUT_DIR, 'index.ts');
     writeFileSync(indexFile, indexContent);
-    console.log('✅ 인덱스 파일 생성 완료');
+    console.log('[OK] 인덱스 파일 생성 완료');
   }
 
   /**
@@ -400,8 +410,8 @@ export type * from './api-types';
    */
   async generate(): Promise<void> {
     try {
-      console.log('🚀 All Influencer SDK 생성을 시작합니다...');
-      console.log(\`📁 출력 디렉토리: \${this.OUTPUT_DIR}\`);
+      console.log('[START] All Influencer SDK 생성을 시작합니다...');
+      console.log(`[DIR] 출력 디렉토리: ${this.OUTPUT_DIR}`);
       
       const schema = await this.fetchOpenAPISchema();
       await this.generateTypes(schema);
@@ -409,17 +419,18 @@ export type * from './api-types';
       this.generateIndexFile();
 
       console.log('');
-      console.log('🎉 SDK 생성이 완료되었습니다!');
-      console.log(\`📁 생성된 파일:\`);
-      console.log(\`   - \${this.TYPES_FILE}\`);
-      console.log(\`   - \${this.CLIENT_FILE}\`);
-      console.log(\`   - \${join(this.OUTPUT_DIR, 'index.ts')}\`);
+      console.log('[DONE] SDK 생성이 완료되었습니다!');
+      console.log(`[DIR] 생성된 파일:`);
+      console.log(`   - ${this.TYPES_FILE}`);
+      console.log(`   - ${this.CLIENT_FILE}`);
+      console.log(`   - ${join(this.OUTPUT_DIR, 'index.ts')}`);
       console.log('');
-      console.log('💡 사용 예시:');
+      console.log('[TIP] 사용 예시:');
       console.log('   import { apiClient, authApi, usersApi } from "@all-influencer/sdk";');
       console.log('');
     } catch (error) {
-      console.error('❌ SDK 생성 실패:', error.message);
+      const message = error instanceof Error ? error.message : '알 수 없는 오류';
+      console.error('[FAIL] SDK 생성 실패:', message);
       process.exit(1);
     }
   }
@@ -433,7 +444,8 @@ if (require.main === module) {
   });
 
   generator.generate().catch((error) => {
-    console.error('실행 중 오류:', error);
+    const message = error instanceof Error ? error.message : '알 수 없는 오류';
+    console.error('실행 중 오류:', message);
     process.exit(1);
   });
 }

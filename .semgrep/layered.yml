@@ -1,0 +1,39 @@
+rules:
+  - id: react-components-must-use-services-layer
+    message: "UI 계층에서는 직접 '@all-influencer/sdk'를 사용하지 말고 apps/web/src/services/* 를 통해 호출하세요."
+    severity: ERROR
+    languages: [typescript]
+    pattern: import $ANY from "@all-influencer/sdk"
+    paths:
+      include:
+        - "/apps/web/src/app/**"
+        - "/apps/web/src/components/**"
+        - "/apps/web/src/hooks/**"
+      exclude:
+        - "/apps/web/src/lib/**"
+        - "/apps/web/src/services/**"
+
+  - id: controllers-must-not-touch-prisma
+    message: "NestJS Controller 계층에서는 Prisma나 DB 서비스를 직접 사용하지 마세요. Service/Repository 계층을 거치세요."
+    severity: ERROR
+    languages: [typescript]
+    pattern-either:
+      - pattern: import $X from "@prisma/client"
+      - pattern: import $X from "../../common/database/prisma.service"
+      - pattern: import $X from "../../../common/database/prisma.service"
+    paths:
+      include:
+        - "/apps/api/src/modules/**/controllers/**.ts"
+        - "/apps/api/src/modules/**/auth/**/*.controller.ts"
+        - "/apps/api/src/modules/**/users.controller.ts"
+
+  - id: services-must-not-import-controllers
+    message: "Service/Application 계층에서 Controller를 import 하면 의존 방향이 역전됩니다."
+    severity: WARNING
+    languages: [typescript]
+    pattern: import $X from "../controllers/$Y"
+    paths:
+      include:
+        - "/apps/api/src/modules/**/services/**.ts"
+        - "/apps/api/src/modules/**/use-cases/**.ts"
+
