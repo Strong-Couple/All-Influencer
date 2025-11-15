@@ -70,22 +70,38 @@ export default async function AdvertiserMyPage() {
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
       <header className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                광고주 대시보드
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                인플루언서 캠페인을 효과적으로 관리하세요
-              </p>
-            </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link
               href="/jobs/create"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 transition-colors"
             >
               <PlusCircle className="h-4 w-4 mr-2" />
-              새 공고 작성
+              공고 작성
+            </Link>
+            
+            <Link
+              href="/my/advertiser/job-posts"
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Briefcase className="h-4 w-4 mr-2" />
+              공고 관리
+            </Link>
+            
+            <Link
+              href="/my/advertiser/applicants"
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              지원자 관리
+            </Link>
+
+            <Link
+              href="/my/advertiser/analytics"
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <BarChart3 className="h-4 w-4 mr-2" />
+              성과 분석
             </Link>
           </div>
         </div>
@@ -329,44 +345,6 @@ export default async function AdvertiserMyPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* 빠른 액션 버튼들 */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">빠른 액션</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link
-              href="/jobs/create"
-              className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              <PlusCircle className="h-4 w-4 mr-2" />
-              공고 작성
-            </Link>
-            
-            <Link
-              href="/my/advertiser/job-posts"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <Briefcase className="h-4 w-4 mr-2" />
-              공고 관리
-            </Link>
-            
-            <Link
-              href="/my/advertiser/applicants"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              지원자 관리
-            </Link>
-
-            <Link
-              href="/my/advertiser/analytics"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              성과 분석
-            </Link>
           </div>
         </div>
       </main>

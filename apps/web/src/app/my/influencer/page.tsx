@@ -6,7 +6,6 @@ import {
   FileText, 
   Heart, 
   Star, 
-  TrendingUp, 
   Award,
   Eye,
   Calendar 
@@ -68,16 +67,39 @@ export default async function InfluencerMyPage() {
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
       <header className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                인플루언서 대시보드
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                {profile.headline || '환영합니다! 프로필을 완성해보세요.'}
-              </p>
-            </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link
+              href="/my/influencer/resume"
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              이력서 편집
+            </Link>
+            
+            <Link
+              href="/my/influencer/applications"
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              지원 현황
+            </Link>
+            
+            <Link
+              href="/my/influencer/scraps"
+              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Heart className="h-4 w-4 mr-2" />
+              스크랩 관리
+            </Link>
+
+            <Link
+              href="/jobs"
+              className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              공고 찾기
+            </Link>
           </div>
         </div>
       </header>
@@ -85,7 +107,7 @@ export default async function InfluencerMyPage() {
       {/* 메인 컨텐츠 */}
       <main className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* 주요 지표 카드 */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
           {/* 총 팔로워 수 */}
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="p-5">
@@ -100,27 +122,6 @@ export default async function InfluencerMyPage() {
                     </dt>
                     <dd className="text-lg font-medium text-gray-900">
                       {profile.totalFollowers.toLocaleString()}명
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 평균 참여율 */}
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <TrendingUp className="h-6 w-6 text-green-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      평균 참여율
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {profile.avgEngagement.toFixed(1)}%
                     </dd>
                   </dl>
                 </div>
@@ -237,44 +238,6 @@ export default async function InfluencerMyPage() {
                 </span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* 빠른 액션 버튼들 */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">빠른 액션</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link
-              href="/my/influencer/resume"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              이력서 편집
-            </Link>
-            
-            <Link
-              href="/my/influencer/applications"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              지원 현황
-            </Link>
-            
-            <Link
-              href="/my/influencer/scraps"
-              className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <Heart className="h-4 w-4 mr-2" />
-              스크랩 관리
-            </Link>
-
-            <Link
-              href="/jobs"
-              className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              공고 찾기
-            </Link>
           </div>
         </div>
       </main>

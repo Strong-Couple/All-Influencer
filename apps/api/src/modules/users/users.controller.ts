@@ -18,6 +18,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 
+import { Public } from '../auth/decorators/public.decorator';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,7 +39,8 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: '사용자 목록 조회', description: '페이지네이션과 필터링을 지원하는 사용자 목록을 조회합니다.' })
+  @Public()
+  @ApiOperation({ summary: '사용자 목록 조회', description: '페이지네이션과 필터링을 지원하는 사용자 목록을 조회합니다. (공개 API)' })
   @ApiResponse({ status: HttpStatus.OK, description: '사용자 목록이 성공적으로 조회되었습니다.' })
   findAll(@Query() query: QueryUsersDto) {
     const { page = 1, limit = 10, ...filters } = query;

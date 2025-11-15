@@ -1,63 +1,49 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { User, LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
+
+import type { AuthUser } from '../types/api';
+import { fetchCurrentUser, logout } from '../services/auth';
 
 export default function AuthButton() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const [pendingLogout, setPendingLogout] = useState(false);
 
   useEffect(() => {
-    checkAuthStatus();
+    let mounted = true;
+
+    async function load() {
+      setLoading(true);
+      const current = await fetchCurrentUser();
+      if (mounted) {
+        setUser(current);
+        setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/v1/auth/me`, {
-        credentials: 'include', // httpOnly 쿠키 포함
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-        setUser(null);
-      }
-    } catch (error) {
-      console.debug('Auth check failed:', error);
-      setIsAuthenticated(false);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogout = async () => {
-    setLoading(true);
+    setPendingLogout(true);
     try {
-      const response = await fetch(`${API_URL}/api/v1/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        setUser(null);
-        setIsAuthenticated(false);
-        window.location.reload(); // 페이지 새로고침으로 상태 초기화
-      } else {
-        alert('로그아웃 실패');
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-      alert('로그아웃 중 오류 발생');
+      await logout();
+      setUser(null);
+      // 로그아웃 성공 후 홈으로 리다이렉트 및 페이지 새로고침
+      router.push('/');
+      router.refresh();
+    } catch {
+      alert('로그아웃에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
-      setLoading(false);
+      setPendingLogout(false);
     }
   };
 
@@ -70,7 +56,7 @@ export default function AuthButton() {
     );
   }
 
-  if (isAuthenticated && user) {
+  if (user) {
     return (
       <div className="flex items-center gap-3">
         {/* 사용자 프로필 */}
@@ -101,11 +87,15 @@ export default function AuthButton() {
           </Link>
           <button
             onClick={handleLogout}
-            disabled={loading}
+            disabled={pendingLogout}
             className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded disabled:opacity-50"
           >
-            <LogOut className="w-3 h-3" />
-            로그아웃
+            {pendingLogout ? (
+              <div className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <LogOut className="w-3 h-3" />
+            )}
+            <span>{pendingLogout ? '로그아웃 중' : '로그아웃'}</span>
           </button>
         </div>
       </div>
